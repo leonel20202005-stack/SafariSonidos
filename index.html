@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Safari de Sonidos y Nombres 🚀</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body onload="cargarPerfiles()">
+
+    <div id="pantalla-inicio">
+        <div class="inicio-contenedor">
+        <h1>🌟 SAFARI DE SONIDOS 🦁</h1>
+        <p>¡Inicia sesión para guardar tu progreso!</p>
+    
+    <button class="btn-google" onclick="window.loginConGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+        Jugar con Google
+    </button>
+
+    <div style="margin: 20px 0; border-top: 2px dashed #eee;"></div>
+
+    <p style="font-size: 0.9em; margin-bottom: 5px;">O juega en este dispositivo:</p>
+    <div id="contenedor-select">
+        <select id="select-perfil" class="select-personalizado" onchange="window.seleccionarPerfil()">
+        </select>
+        <a id="btn-eliminar-perfil" onclick="window.eliminarPerfil()">Eliminar Explorador</a>
+    </div>
+
+    <input type="text" id="input-nombre-nuevo" placeholder="Nombre del Explorador" maxlength="15" style="display: none;">
+    <button class="btn-comenzar" onclick="window.iniciarJuego()">¡ENTRAR AL SAFARI!</button>
+</div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h1 style="font-size: 50px;">🎉</h1>
+            <h2 id="modal-titulo">¡Nivel Superado!</h2>
+            <p id="modal-puntos">Puntos obtenidos en el nivel: 50</p>
+            <button class="btn-comenzar" onclick="siguiente()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <div class="contenedor-principal" id="juego" style="display: none;">
+        
+        <div id="sidebar">
+            <div class="perfil">
+                <h3>Explorador</h3>
+                <h2 id="nombre-jugador">---</h2>
+            </div>
+            
+            <div class="categoria-btn desbloqueada" id="cat-granja" onclick="cambiarCategoria('granja')">
+                <span>🏡 Granja</span>
+                <div class="estrellas" id="star-granja">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-mar" onclick="cambiarCategoria('mar')">
+                <span>🌊 Mar 🔒</span>
+                <div class="estrellas" id="star-mar">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-selva" onclick="cambiarCategoria('selva')">
+                <span>🦁 Selva 🔒</span>
+                <div class="estrellas" id="star-selva">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-desierto" onclick="cambiarCategoria('desierto')">
+                <span>🏜️ Desierto 🔒</span>
+                <div class="estrellas" id="star-desierto">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-artico" onclick="cambiarCategoria('artico')">
+                <span>🧊 Ártico 🔒</span>
+                <div class="estrellas" id="star-artico">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-bosque" onclick="cambiarCategoria('bosque')">
+                <span>🌳 Bosque 🔒</span>
+                <div class="estrellas" id="star-bosque">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-montana" onclick="cambiarCategoria('montana')">
+                <span>⛰️ Montaña 🔒</span>
+                <div class="estrellas" id="star-montana">☆☆☆</div>
+            </div>
+            <div class="categoria-btn" id="cat-rio" onclick="cambiarCategoria('rio')">
+                <span>🏞️ Río / Agua Dulce 🔒</span>
+                <div class="estrellas" id="star-rio">☆☆☆</div>
+            </div>
+
+            <div id="btn-menu-principal" onclick="volverAlMenu()">
+                ⬅️ Cambiar de Explorador
+            </div>
+        </div>
+
+        <div id="area-juego">
+            
+            <div class="header-nivel">
+                <div id="barra-progreso-stats">
+                    
+                    <div class="puntos-totales-lateral">
+                        ✨ TOTAL<span id="puntuacion-total-lateral">0</span>
+                    </div>
+
+                    <div class="titulo-stats">
+                        <span id="titulo-nivel-emoji">🏡</span> <span id="titulo-nivel">GRANJA - NIVEL 1</span>
+                    </div>
+
+                    <div class="stats-cajas">
+                        <div class="stat-box" id="stat-puntos">
+                            <div class="stat-label">PUNTOS NIVEL</div>
+                            <div class="stat-valor" id="puntos-nivel">0</div>
+                        </div>
+                        <div class="stat-box" id="stat-meta">
+                            <div class="stat-label">META</div>
+                            <div class="stat-valor" id="meta-nivel">0</div>
+                        </div>
+                        <div class="stat-box" id="stat-listos">
+                            <div class="stat-label">ANIMALES LISTOS</div>
+                            <div class="stat-valor" id="listos-nivel">0/0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progreso-bar-contenedor">
+                        <div id="progreso-bar">
+                            <span id="progreso-porcentaje">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <span id="instruccion">¡Arrastra la ficha correcta al animal!</span>
+            </div>
+
+            <div id="tablero"></div>
+        </div>
+
+        <div id="panel-opciones"></div>
+    </div>
+
+<script type="module">
+    // --- 1. IMPORTAR FIREBASE (Versión Web) ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // --- 2. TU CONFIGURACIÓN (Tus claves reales) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-E0E2f41wRB3WOG2QjrPlfhOkGn1UjQc",
+        authDomain: "safarisonidos.firebaseapp.com",
+        projectId: "safarisonidos",
+        storageBucket: "safarisonidos.firebasestorage.app",
+        messagingSenderId: "539812546780",
+        appId: "1:539812546780:web:453c1e20074f9bfac70c19"
+    };
+
+    // --- 3. INICIALIZAR FIREBASE (Solo una vez) ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // -----------------------------------------------------------
+    // LÓGICA DEL JUEGO
+    // -----------------------------------------------------------
+
+    const GITHUB_URL = 'https://raw.githubusercontent.com/leonel20202005-stack/audiosJuego/main/';
+    const NUM_ANIMALES_POR_NIVEL = 5; 
+    
+    // BASE DE DATOS
+    const db = {
+        granja: [
+            { nombre: "Vaca",    sonido: "Muuu",     emoji: "🐄", archivo: "vaca.mp3" }, 
+            { nombre: "Cerdo",   sonido: "Oink",     emoji: "🐷", archivo: "cerdo.mp3" },
+            { nombre: "Gallo",   sonido: "Kikirikí", emoji: "🐓", archivo: "gallo.mp3" }, 
+            { nombre: "Oveja",   sonido: "Beeee",    emoji: "🐑", archivo: "oveja.mp3" },
+            { nombre: "Pato",    sonido: "Cuac",     emoji: "🦆", archivo: "pato.mp3" },
+            { nombre: "Caballo", sonido: "Hiiiii",   emoji: "🐴", archivo: "caballo.mp3" }, 
+            { nombre: "Pavo",    sonido: "Glu Glu",  emoji: "🦃", archivo: "pavo.mp3" },
+            { nombre: "Conejo",  sonido: "Sniff",    emoji: "🐇", archivo: "conejo.mp3" }, 
+            { nombre: "Cabra",   sonido: "Meeeh",    emoji: "🐐", archivo: "cabra.mp3" },
+            { nombre: "Ganso",   sonido: "Honk",     emoji: "🦢", archivo: "ganso.mp3" },
+            { nombre: "Burro",   sonido: "Hiaaw",    emoji: "🫏", archivo: "burro.mp3" }, 
+            { nombre: "Ratón",   sonido: "Squeak",   emoji: "🐁", archivo: "raton.mp3" },
+            { nombre: "Gallina", sonido: "Cluck",    emoji: "🐔", archivo: "gallina.mp3" }, 
+            { nombre: "Abeja",   sonido: "Bzzzz",    emoji: "🐝", archivo: "abeja.mp3" },
+            { nombre: "Hámster", sonido: "Chirp",    emoji: "🐹", archivo: "hamster.mp3" }
+        ],
+        mar: [
+            { nombre: "Ballena Azul", sonido: "Uuuuh", emoji: "🐋" }, { nombre: "Delfín", sonido: "Click", emoji: "🐬" },
+            { nombre: "Pulpo", sonido: "Blub", emoji: "🐙" }, { nombre: "Tiburón", sonido: "Chomp", emoji: "🦈" },
+            { nombre: "Tortuga Marina", sonido: "Hiss", emoji: "🐢" },
+            { nombre: "Langosta", sonido: "Snap", emoji: "🦞" }, { nombre: "Camarón", sonido: "Sshh", emoji: "🦐" },
+            { nombre: "Medusa", sonido: "Jelly", emoji: "🦑" }, { nombre: "Foca Común", sonido: "Arf Arf", emoji: "🦭" },
+            { nombre: "Morsa", sonido: "Roar", emoji: "🦭" },
+            { nombre: "Estrella de Mar", sonido: "Shine", emoji: "⭐" }, { nombre: "Hipocampo", sonido: "Glug", emoji: "🫎" },
+            { nombre: "Nutria de Mar", sonido: "Squeal", emoji: "🦦" }, { nombre: "Anguila Eléctrica", sonido: "Zap", emoji: "🐍" },
+            { nombre: "Calamar", sonido: "Ink", emoji: "🦑" }
+        ],
+        selva: [
+            { nombre: "León", sonido: "Roaar", emoji: "🦁" }, { nombre: "Mono", sonido: "Uuh-Ah", emoji: "🐵" },
+            { nombre: "Elefante", sonido: "Pauuu", emoji: "🐘" }, { nombre: "Tigre", sonido: "Grrr", emoji: "🐯" },
+            { nombre: "Loro", sonido: "Hola", emoji: "🦜" },
+            { nombre: "Cocodrilo", sonido: "Snap", emoji: "🐊" }, { nombre: "Gorila", sonido: "Ugh", emoji: "🦍" },
+            { nombre: "Jirafa", sonido: "Mmm", emoji: "🦒" }, { nombre: "Cebra", sonido: "Bray", emoji: "🦓" },
+            { nombre: "Rinoceronte", sonido: "Grunt", emoji: "🦏" },
+            { nombre: "Panda", sonido: "Chew", emoji: "🐼" }, { nombre: "Tucán", sonido: "Croak", emoji: "🦜" },
+            { nombre: "Perezoso", sonido: "Yawn", emoji: "🦥" }, { nombre: "Chimpancé", sonido: "Hoot", emoji: "🐒" },
+            { nombre: "Ocelote", sonido: "Meow", emoji: "🐆" }
+        ],
+        desierto: [
+            { nombre: "Coyote", sonido: "Aullido", emoji: "🐺" }, { nombre: "Serpiente Cascabel", sonido: "Rattle", emoji: "🐍" },
+            { nombre: "Camello", sonido: "Grunt", emoji: "🐪" }, { nombre: "Fenec", sonido: "Yelp", emoji: "🦊" },
+            { nombre: "Correcaminos", sonido: "Beep", emoji: "🐦" },
+            { nombre: "Escorpión", sonido: "Click", emoji: "🦂" }, { nombre: "Búho del Desierto", sonido: "Hoo", emoji: "🦉" },
+            { nombre: "Lagarto Monitor", sonido: "Scurry", emoji: "🦎" }, { nombre: "Hiena", sonido: "Risa", emoji: "🦛" },
+            { nombre: "Jerbo", sonido: "Chirp", emoji: "🐁" },
+            { nombre: "Adax", sonido: "Sigh", emoji: "🐏" }, { nombre: "Dromedario", sonido: "Gurgle", emoji: "🐫" },
+            { nombre: "Suricata", sonido: "Watch", emoji: "🦦" }, { nombre: "Tarántula", sonido: "Tap", emoji: "🕷️" },
+            { nombre: "Halcon Peregrino", sonido: "Screech", emoji: "🦅" }
+        ],
+        artico: [
+            { nombre: "Oso Polar", sonido: "Growl", emoji: "🐻‍❄️" }, { nombre: "Zorro Ártico", sonido: "Bark", emoji: "🦊" },
+            { nombre: "Narval", sonido: "Click", emoji: "🐳" }, { nombre: "Reno / Caribú", sonido: "Snort", emoji: "🦌" },
+            { nombre: "Beluga", sonido: "Melon", emoji: "🐋" },
+            { nombre: "Búho Nival", sonido: "Hoot", emoji: "🦉" }, { nombre: "Liebre Ártica", sonido: "Thump", emoji: "🐇" },
+            { nombre: "Lobo Ártico", sonido: "Howl", emoji: "🐺" }, { nombre: "Pingüino Emperador", sonido: "Squawk", emoji: "🐧" },
+            { nombre: "Lince Canadiense", sonido: "Meow", emoji: "🐈" },
+            { nombre: "Kodiak", sonido: "Roar", emoji: "🐻" }, { nombre: "Orca", sonido: "Whistle", emoji: "🐋" },
+            { nombre: "Alce", sonido: "Bellow", emoji: "🦌" }, { nombre: "Rata almizclera", sonido: "Splash", emoji: "🐭" },
+            { nombre: "Marmota Alpina", sonido: "Whistle", emoji: "🐿️" }
+        ],
+        bosque: [
+            { nombre: "Oso Pardo", sonido: "Roar", emoji: "🐻" }, { nombre: "Búho Real", sonido: "Hoot", emoji: "🦉" },
+            { nombre: "Venado cola blanca", sonido: "Snort", emoji: "🦌" }, { nombre: "Mapache", sonido: "Chirr", emoji: "🦝" },
+            { nombre: "Lobo Gris", sonido: "Howl", emoji: "🐺" },
+            { nombre: "Ardilla", sonido: "Chirp", emoji: "🐿️" }, { nombre: "Tejón", sonido: "Hiss", emoji: "🦡" },
+            { nombre: "Zorro Rojo", sonido: "Yelp", emoji: "🦊" }, { nombre: "Jabalí", sonido: "Oink", emoji: "🐗" },
+            { nombre: "Mofeta", sonido: "Stink", emoji: "🦨" },
+            { nombre: "Puercoespín", sonido: "Quill", emoji: "🦔" }, { nombre: "Castor Canadiense", sonido: "Slap", emoji: "🦫" },
+            { nombre: "Pájaro Carpintero", sonido: "Tap Tap", emoji: "🐦" }, { nombre: "Comadreja", sonido: "Hiss", emoji: "🪱" },
+            { nombre: "Gato Montés", sonido: "Meow", emoji: "🐈" }
+        ],
+        montana: [
+            { nombre: "Cabra Montés", sonido: "Bleat", emoji: "🐐" }, { nombre: "Cóndor Andino", sonido: "Hiss", emoji: "🦅" },
+            { nombre: "Leopardo de las Nieves", sonido: "Chuff", emoji: "🐆" }, { nombre: "Puma", sonido: "Scream", emoji: "🐈" },
+            { nombre: "Águila Real", sonido: "Screech", emoji: "🦅" },
+            { nombre: "Borrego Cimarrón", sonido: "Baaa", emoji: "🐑" }, { nombre: "Oso Grizzly", sonido: "Grunt", emoji: "🐻" },
+            { nombre: "Lama", sonido: "Spit", emoji: "🦙" }, { nombre: "Muflón", sonido: "Bleat", emoji: "🐑" },
+            { nombre: "Yak", sonido: "Moo", emoji: "🐃" },
+            { nombre: "Bisonte", sonido: "Snort", emoji: "🦬" }, { nombre: "Armadillo", sonido: "Click", emoji: "🦔" },
+            { nombre: "Chinchilla", sonido: "Squeak", emoji: "🐹" }, { nombre: "Vicúña", sonido: "Snort", emoji: "🦙" },
+            { nombre: "Guepardo", sonido: "Chirp", emoji: "🐆" }
+        ],
+        rio: [
+            { nombre: "Nutria de Río", sonido: "Squeal", emoji: "🦦" }, { nombre: "Castor", sonido: "Slap", emoji: "🦫" },
+            { nombre: "Pez Gato", sonido: "Meow", emoji: "🐟" }, { nombre: "Caimán", sonido: "Bellow", emoji: "🐊" },
+            { nombre: "Libélula", sonido: "Buzz", emoji: "🦟" },
+            { nombre: "Rana Arborícola", sonido: "Croak", emoji: "🐸" }, { nombre: "Tortuga de agua dulce", sonido: "Hiss", emoji: "🐢" },
+            { nombre: "Garza", sonido: "Squawk", emoji: "🦆" }, { nombre: "Sapo Común", sonido: "Ribbit", emoji: "🐸" },
+            { nombre: "Piraña", sonido: "Bite", emoji: "🐟" },
+            { nombre: "Pelícano", sonido: "Gulp", emoji: "鹈" }, { nombre: "Lombriz", sonido: "Wiggle", emoji: "🐛" },
+            { nombre: "Cangrejo de río", sonido: "Click", emoji: "🦀" }, { nombre: "Hipopótamo", sonido: "Grunt", emoji: "🦛" },
+            { nombre: "Tritón", sonido: "Splash", emoji: "🦎" }
+        ]
+    };
+    const catEmojis = { 
+        granja: '🏡', mar: '🌊', selva: '🦁', 
+        desierto: '🏜️', artico: '🧊', bosque: '🌳', montana: '⛰️', rio: '🏞️' 
+    };
+    const ALL_CATEGORIES = Object.keys(db);
+
+    // --- VARIABLES DE ESTADO ---
+    let perfiles = [];
+    let perfilActual = null;
+    let usuarioGoogle = null;
+
+    let estado = {
+        cat: 'granja', nivel: 1, puntos: 0, 
+        progreso: ALL_CATEGORIES.reduce((acc, c) => ({ ...acc, [c]: 0 }), {}),
+        animalesCompletados: 0, 
+        totalAnimalesNivel: NUM_ANIMALES_POR_NIVEL,
+        metaPuntosNivel: NUM_ANIMALES_POR_NIVEL * 2 * 10 
+    };
+
+    // --- FUNCIONES DE AUTENTICACIÓN GOOGLE ---
+    
+    // Hacemos las funciones accesibles globalmente (window)
+    window.loginConGoogle = function() {
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                const user = result.user;
+                console.log("Usuario logueado:", user.displayName);
+                gestionarUsuarioGoogle(user);
+            }).catch((error) => {
+                console.error("Error login:", error);
+                alert("Hubo un error al conectar con Google: " + error.message);
+            });
+    }
+
+    function gestionarUsuarioGoogle(user) {
+        usuarioGoogle = user;
+        window.cargarPerfiles();
+        
+        // Buscar perfil por UID de Google
+        let perfilEncontrado = perfiles.find(p => p.googleUid === user.uid);
+        
+        if (!perfilEncontrado) {
+            // Crear perfil nuevo si no existe
+            perfilEncontrado = {
+                nombre: user.displayName || "Explorador Google",
+                puntos: 0,
+                progreso: ALL_CATEGORIES.reduce((acc, c) => ({ ...acc, [c]: 0 }), {}),
+                catActual: 'granja',
+                nivelActual: 1,
+                googleUid: user.uid,
+                foto: user.photoURL
+            };
+            perfiles.push(perfilEncontrado);
+            guardarPerfiles();
+        }
+
+        perfilActual = perfilEncontrado;
+        window.iniciarJuego(true);
+    }
+
+    // --- GESTIÓN DE PERFILES ---
+    
+    window.cargarPerfiles = function() {
+        detenerSonidoAnterior(); 
+        const perfilesJSON = localStorage.getItem('safariSonidosPerfiles');
+        perfiles = perfilesJSON ? JSON.parse(perfilesJSON) : [];
+        
+        const select = document.getElementById('select-perfil');
+        const inputNuevo = document.getElementById('input-nombre-nuevo');
+        select.innerHTML = '';
+        
+        const optSeleccionar = document.createElement('option');
+        optSeleccionar.value = "";
+        optSeleccionar.textContent = perfiles.length === 0 ? "--- Crea un nuevo explorador ---" : "--- Elige un explorador ---";
+        select.appendChild(optSeleccionar);
+        
+        perfiles.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.nombre; 
+            const esGoogle = p.googleUid ? " (G)" : "";
+            opt.textContent = `${p.nombre}${esGoogle} - Puntos: ${p.puntos}`;
+            if(p.googleUid) opt.setAttribute('data-uid', p.googleUid);
+            select.appendChild(opt);
+        });
+        
+        perfilActual = null;
+        inputNuevo.value = '';
+        
+        if (perfiles.length === 0) {
+            inputNuevo.style.display = 'block';
+        } else {
+            inputNuevo.style.display = 'none';
+        }
+        document.getElementById('btn-eliminar-perfil').style.display = 'none';
+        select.selectedIndex = 0; 
+    }
+
+    function guardarPerfiles() {
+        localStorage.setItem('safariSonidosPerfiles', JSON.stringify(perfiles));
+    }
+
+    window.seleccionarPerfil = function() {
+        const select = document.getElementById('select-perfil');
+        const nombreSeleccionado = select.value;
+        const selectedOption = select.options[select.selectedIndex];
+        const uid = selectedOption.getAttribute('data-uid');
+        const inputNuevo = document.getElementById('input-nombre-nuevo');
+
+        if (nombreSeleccionado) {
+            if(uid) {
+                perfilActual = perfiles.find(p => p.googleUid === uid);
+            } else {
+                perfilActual = perfiles.find(p => p.nombre === nombreSeleccionado && !p.googleUid);
+            }
+            
+            estado.puntos = perfilActual.puntos;
+            estado.progreso = perfilActual.progreso;
+            estado.cat = perfilActual.catActual;
+            estado.nivel = perfilActual.nivelActual;
+            
+            inputNuevo.value = ''; 
+            inputNuevo.style.display = 'none';
+            document.getElementById('btn-eliminar-perfil').style.display = 'block';
+        } else {
+            perfilActual = null;
+            inputNuevo.style.display = 'block';
+            document.getElementById('btn-eliminar-perfil').style.display = 'none';
+            estado.cat = 'granja';
+            estado.nivel = 1;
+            estado.puntos = 0;
+        }
+    }
+
+    window.eliminarPerfil = function() {
+        if (!perfilActual) return;
+        if (confirm(`¿Borrar a ${perfilActual.nombre}?`)) {
+            if(perfilActual.googleUid) {
+                perfiles = perfiles.filter(p => p.googleUid !== perfilActual.googleUid);
+            } else {
+                perfiles = perfiles.filter(p => p.nombre !== perfilActual.nombre);
+            }
+            perfilActual = null;
+            guardarPerfiles();
+            window.cargarPerfiles();
+        }
+    }
+
+    function actualizarPerfil() {
+        if (perfilActual) {
+            perfilActual.puntos = estado.puntos;
+            perfilActual.progreso = estado.progreso;
+            perfilActual.catActual = estado.cat;
+            perfilActual.nivelActual = estado.nivel;
+            guardarPerfiles();
+        }
+    }
+
+    // --- FUNCIONES PRINCIPALES DEL JUEGO ---
+
+    window.iniciarJuego = function(esLoginGoogle = false) {
+        const inputNuevo = document.getElementById('input-nombre-nuevo');
+        const nombreNuevo = inputNuevo.value.trim().toUpperCase();
+
+        if (!esLoginGoogle) {
+            if (nombreNuevo) {
+                if (perfiles.some(p => p.nombre.toUpperCase() === nombreNuevo)) {
+                    return alert(`¡El nombre "${nombreNuevo}" ya existe!`);
+                }
+                perfilActual = {
+                    nombre: nombreNuevo,
+                    puntos: 0,
+                    progreso: ALL_CATEGORIES.reduce((acc, c) => ({ ...acc, [c]: 0 }), {}),
+                    catActual: 'granja',
+                    nivelActual: 1
+                };
+                perfiles.push(perfilActual);
+                guardarPerfiles();
+                
+                estado.puntos = 0;
+                estado.progreso = ALL_CATEGORIES.reduce((acc, c) => ({ ...acc, [c]: 0 }), {});
+                estado.cat = 'granja';
+                estado.nivel = 1;
+            } else if (!perfilActual) {
+                return alert("Selecciona un explorador o usa Google.");
+            }
+        }
+        
+        document.getElementById('nombre-jugador').innerText = perfilActual.nombre.toUpperCase();
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('pantalla-inicio').style.display = 'none';
+        document.getElementById('juego').style.display = 'flex';
+        
+        cargarNivel();
+    }
+
+    window.volverAlMenu = function() {
+        if (confirm("¿Volver al menú?")) {
+            document.getElementById('juego').style.display = 'none';
+            document.getElementById('pantalla-inicio').style.display = 'flex';
+            window.cargarPerfiles();
+        }
+    }
+
+    window.cambiarCategoria = function(nuevaCat) {
+        const btn = document.getElementById(`cat-${nuevaCat}`);
+        if(btn.classList.contains('desbloqueada') && estado.cat !== nuevaCat) {
+            estado.cat = nuevaCat;
+            estado.nivel = estado.progreso[nuevaCat] < 3 ? estado.progreso[nuevaCat] + 1 : 3; 
+            cargarNivel();
+        }
+    }
+
+    function cargarNivel() {
+        if (!perfilActual) return; 
+        if (estado.cat === 'granja' && estado.puntos === 0 && estado.nivel !== 1) estado.nivel = 1;
+        
+        const tablero = document.getElementById('tablero');
+        const panel = document.getElementById('panel-opciones');
+        tablero.innerHTML = '';
+        panel.innerHTML = '';
+        
+        const inicio = (estado.nivel - 1) * NUM_ANIMALES_POR_NIVEL;
+        const animalesNivel = db[estado.cat].slice(inicio, inicio + NUM_ANIMALES_POR_NIVEL);
+        
+        estado.totalAnimalesNivel = animalesNivel.length;
+        estado.animalesCompletados = 0; 
+        estado.metaPuntosNivel = estado.totalAnimalesNivel * 2 * 10; 
+
+        document.getElementById('titulo-nivel').innerText = `${estado.cat.toUpperCase()} - NIVEL ${estado.nivel}`;
+        document.getElementById('titulo-nivel-emoji').innerText = catEmojis[estado.cat];
+
+        animalesNivel.forEach((animal, i) => {
+            const card = document.createElement('div');
+            card.className = 'tarjeta';
+            card.id = `card-${i}`;
+            const huecos = crearHueco(animal.nombre, 'texto') + crearHueco(animal.sonido, 'sonido');
+            card.innerHTML = `<div class="emoji-grande" onclick="window.hablar('${animal.sonido}')">${animal.emoji}</div>${huecos}`;
+            tablero.appendChild(card);
+        });
+
+        let opciones = [];
+        animalesNivel.forEach(animal => {
+            opciones.push({ val: animal.nombre, tipo: 'texto' });
+            opciones.push({ val: animal.sonido, tipo: 'sonido' });
+        });
+        opciones.sort(() => Math.random() - 0.5);
+
+        opciones.forEach(op => {
+            const ficha = document.createElement('div');
+            ficha.className = 'ficha';
+            ficha.draggable = true;
+            ficha.id = 'ficha-' + Math.random().toString(36).substr(2,9);
+            if(op.tipo === 'sonido') {
+                ficha.innerHTML = `<div class="btn-play-mini" onclick="window.hablar('${op.val}')">🔊</div> ${op.val.toUpperCase()}`;
+            } else {
+                ficha.innerHTML = op.val.toUpperCase();
+            }
+            ficha.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text', op.val);
+                e.dataTransfer.setData('id', ficha.id);
+            });
+            panel.appendChild(ficha);
+        });
+        
+        actualizarStats(0, estado.animalesCompletados);
+        actualizarSidebar();
+        actualizarPerfil(); 
+    }
+
+    function crearHueco(target, tipo) {
+        const etiqueta = tipo === 'texto' ? 'NOMBRE' : 'SONIDO';
+        return `<div class="zona-drop" data-target="${target}">${etiqueta}</div>`;
+    }
+
+    // --- AUDIO ---
+    let audioActual = null; 
+    let timerAudio = null; 
+
+    function detenerSonidoAnterior() {
+        if (audioActual) {
+            audioActual.pause();
+            audioActual.currentTime = 0;
+            audioActual = null;
+        }
+        window.speechSynthesis.cancel();
+        if (timerAudio) {
+            clearTimeout(timerAudio);
+            timerAudio = null;
+        }
+    }
+
+    window.hablar = function(texto) {
+        detenerSonidoAnterior();
+        let animalEncontrado = db[estado.cat].find(a => a.sonido === texto);
+        if (animalEncontrado && animalEncontrado.archivo) {
+            const audioUrl = GITHUB_URL + animalEncontrado.archivo;
+            audioActual = new Audio(audioUrl);
+            audioActual.play().catch(error => {
+                window.usarVozRobot(texto);
+            });
+            timerAudio = setTimeout(() => {
+                if (audioActual) { audioActual.pause(); audioActual = null; }
+            }, 5000); 
+        } else {
+            window.usarVozRobot(texto);
+        }
+    }
+
+    window.usarVozRobot = function(texto) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = 'es-ES';
+        window.speechSynthesis.speak(u);
+    }
+
+    // --- UI HELPERS ---
+    
+    function actualizarStats(puntosNivel, animalesListos) {
+        const totalFichasNivel = estado.totalAnimalesNivel * 2;
+        const fichasCompletadas = puntosNivel / 10;
+        const porcentaje = totalFichasNivel > 0 ? Math.round((fichasCompletadas / totalFichasNivel) * 100) : 0;
+        
+        document.getElementById('puntuacion-total-lateral').innerText = estado.puntos; 
+        document.getElementById('puntos-nivel').innerText = puntosNivel;
+        document.getElementById('meta-nivel').innerText = estado.metaPuntosNivel;
+        document.getElementById('listos-nivel').innerText = `${animalesListos}/${estado.totalAnimalesNivel}`;
+        
+        document.getElementById('progreso-bar').style.width = `${porcentaje}%`;
+        document.getElementById('progreso-porcentaje').innerText = `${porcentaje}%`;
+        actualizarPerfil();
+    }
+
+    function actualizarSidebar() {
+        ALL_CATEGORIES.forEach((c, i) => {
+            const btn = document.getElementById(`cat-${c}`);
+            const stars = document.getElementById(`star-${c}`);
+            btn.classList.remove('activa');
+            if(estado.cat === c) btn.classList.add('activa');
+
+            let s = '';
+            for(let k=0; k<3; k++) {
+                s += k < estado.progreso[c] ? '<span class="estrella ganada">★</span>' : '<span class="estrella">☆</span>';
+            }
+            stars.innerHTML = s;
+
+            if(i > 0) {
+                const prev = ALL_CATEGORIES[i-1];
+                if(estado.progreso[prev] >= 3) {
+                    btn.classList.add('desbloqueada');
+                    let spanText = btn.querySelector('span').innerText;
+                    if(spanText.includes('🔒')) btn.querySelector('span').innerText = spanText.replace(' 🔒','');
+                } else if (!btn.classList.contains('desbloqueada')) {
+                    if(!btn.querySelector('span').innerText.includes('🔒')) btn.querySelector('span').innerText += ' 🔒';
+                }
+            }
+        });
+        actualizarPerfil();
+    }
+
+    // --- GAMEPLAY LOGIC ---
+
+    document.addEventListener('dragover', e => {
+        if(e.target.classList.contains('zona-drop')) {
+            e.preventDefault();
+            e.target.classList.add('hover');
+        }
+    });
+    document.addEventListener('dragleave', e => {
+        if(e.target.classList.contains('zona-drop')) e.target.classList.remove('hover');
+    });
+    document.addEventListener('drop', e => {
+        if(e.target.classList.contains('zona-drop')) {
+            e.preventDefault();
+            const zone = e.target;
+            zone.classList.remove('hover');
+            
+            const val = e.dataTransfer.getData('text');
+            const id = e.dataTransfer.getData('id');
+            const target = zone.getAttribute('data-target');
+
+            if(val === target) {
+                zone.style.background = '#4A4E69';
+                zone.style.color = '#A1FFCE';
+                zone.classList.add('acierto');
+                zone.innerHTML = `✅ ${val.toUpperCase()}`;
+                
+                estado.puntos += 10;
+                const puntosNivelActual = parseInt(document.getElementById('puntos-nivel').innerText) + 10;
+                
+                const ficha = document.getElementById(id);
+                if(ficha) {
+                    ficha.classList.add('usada');
+                    setTimeout(() => ficha.remove(), 400);
+                }
+
+                const parent = zone.parentElement;
+                const zonas = parent.querySelectorAll('.zona-drop');
+                let completa = true;
+                zonas.forEach(z => { if(!z.innerHTML.includes('✅')) completa = false; });
+
+                if(completa) estado.animalesCompletados++; 
+                actualizarStats(puntosNivelActual, estado.animalesCompletados);
+
+                if(completa) {
+                    setTimeout(() => {
+                        parent.classList.add('completada');
+                        setTimeout(() => {
+                            parent.style.visibility = 'hidden';
+                            if(estado.animalesCompletados === estado.totalAnimalesNivel) victoria(puntosNivelActual);
+                        }, 700);
+                    }, 500);
+                }
+            } else {
+                zone.classList.add('error');
+                setTimeout(() => zone.classList.remove('error'), 500);
+            }
+        }
+    });
+
+    function victoria(puntosNivel) {
+        if(estado.nivel > estado.progreso[estado.cat]) estado.progreso[estado.cat] = estado.nivel;
+        const esCategoriaCompleta = estado.nivel === 3;
+        document.getElementById('modal-titulo').innerText = esCategoriaCompleta ? "¡CATEGORÍA COMPLETA! 🏆" : "¡NIVEL SUPERADO! ✨";
+        document.getElementById('modal-puntos').innerText = `¡Sumaste ${puntosNivel} PUNTOS!`;
+        document.getElementById('modal').style.display = 'flex';
+        actualizarPerfil();
+    }
+
+    window.siguiente = function() {
+        document.getElementById('modal').style.display = 'none';
+        if(estado.nivel < 3) {
+            estado.nivel++;
+            cargarNivel();
+        } else {
+            const idx = ALL_CATEGORIES.indexOf(estado.cat);
+            if(idx < ALL_CATEGORIES.length - 1) {
+                estado.cat = ALL_CATEGORIES[idx+1];
+                estado.nivel = 1;
+                cargarNivel();
+            } else {
+                alert("¡JUEGO COMPLETADO! 🥇");
+                window.volverAlMenu();
+            }
+        }
+    }
+
+    // --- CARGA INICIAL ---
+    window.onload = function() {
+        window.cargarPerfiles();
+    }
+</script>
+</body>
+</html>

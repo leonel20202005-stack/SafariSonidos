@@ -1,0 +1,386 @@
+/* -------------------------------------------------------------------------- */
+/* ESTILOS BASE                               */
+/* -------------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Usamos la fuente Nunito por ser amigable y clara */
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    /* Fondo más vibrante y animado */
+    background: linear-gradient(135deg, #FF6F61 0%, #FFD166 100%);
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Título principal con fuente impactante */
+h1, h2, #modal-titulo {
+    font-family: 'Luckiest Guy', cursive;
+    text-shadow: 2px 4px 0px rgba(0,0,0,0.1);
+}
+
+/* -------------------------------------------------------------------------- */
+/* PANTALLA DE INICIO                           */
+/* -------------------------------------------------------------------------- */
+
+#pantalla-inicio {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #4A4E69 0%, #9A8C98 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000;
+}
+.inicio-contenedor {
+    background: #FFFFFF; padding: 40px; border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    text-align: center; max-width: 550px; width: 90%; 
+    animation: bounceIn 0.8s, flotarInicio 3s ease-in-out infinite 0.8s;
+    border: 8px solid #FFD166; /* Borde de color */
+}
+@keyframes bounceIn { from { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } to { transform: scale(1); } }
+@keyframes flotarInicio { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+.inicio-contenedor h1 { 
+    color: #FF6F61; 
+    font-size: 4em; 
+    margin-bottom: 5px; 
+    letter-spacing: 2px;
+    text-shadow: 4px 4px 0px #4A4E69;
+}
+.inicio-contenedor p {
+    color: #4A4E69;
+    font-weight: 700;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+/* Estilos para el selector de perfiles (Nuevo) */
+#contenedor-select { margin: 25px 0; }
+.select-personalizado, #input-nombre-nuevo { 
+    width: 100%; padding: 18px; font-size: 1.2em; border: 4px solid #577590;
+    border-radius: 15px; text-align: center; 
+    font-family: 'Nunito', sans-serif; outline: none; color: #4A4E69; 
+    transition: all 0.3s;
+    cursor: pointer;
+    appearance: none; /* Oculta la flecha nativa */
+    background: #f8f8f8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234A4E69' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 15px center;
+    background-size: 20px;
+}
+#input-nombre-nuevo {
+    margin-bottom: 15px;
+    cursor: text;
+    background: #f8f8f8;
+}
+.select-personalizado:focus, #input-nombre-nuevo:focus {
+    border-color: #FF6F61;
+    box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
+}
+.select-personalizado option {
+    padding: 10px;
+}
+
+/* Estilo para el botón de eliminar */
+#btn-eliminar-perfil {
+    color: #FF6F61;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+}
+
+
+.btn-comenzar { 
+    width: 100%; padding: 18px; font-size: 1.8em; 
+    background: linear-gradient(90deg, #577590, #90AFC5);
+    color: white; border: none; border-radius: 50px; cursor: pointer; 
+    box-shadow: 0 8px 0 #4A4E69; 
+    transition: all 0.1s; 
+    font-family: 'Luckiest Guy', cursive;
+    margin-top: 25px; /* Ajuste el margen superior */
+}
+.btn-comenzar:active { 
+    transform: translateY(4px); 
+    box-shadow: 0 4px 0 #4A4E69; 
+}
+
+/* -------------------------------------------------------------------------- */
+/* LAYOUT                                   */
+/* -------------------------------------------------------------------------- */
+
+.contenedor-principal { display: flex; width: 100%; height: 100vh; }
+
+/* --- SIDEBAR (Menú de Categorías) --- */
+#sidebar { 
+    width: 280px; background: #FFFFFF; padding: 25px 20px; 
+    display: flex; flex-direction: column; gap: 12px; 
+    box-shadow: 8px 0 20px rgba(0,0,0,0.15); z-index: 100;
+    overflow-y: auto; 
+}
+.perfil { background: #FFD166; padding: 15px; border-radius: 18px; text-align: center; margin-bottom: 15px; border: 3px dashed #4A4E69; }
+.perfil h3 { color: #4A4E69; font-size: 1em; margin-bottom: 3px; }
+.perfil h2 { color: #FF6F61; font-family: 'Luckiest Guy', cursive; font-size: 1.8em; }
+
+.categoria-btn { 
+    padding: 12px 15px; 
+    border-radius: 15px; cursor: pointer; transition: all 0.3s; 
+    background: #F0F4F7;
+    border: 3px solid #E0E4E7; 
+    opacity: 0.6; pointer-events: none; 
+    display: flex; justify-content: space-between; align-items: center;
+}
+.categoria-btn.desbloqueada { opacity: 1; pointer-events: all; border-color: #FFD166; }
+.categoria-btn.desbloqueada:hover { 
+    background: #FFF9E9; 
+    transform: scale(1.02); 
+    box-shadow: 0 4px 10px rgba(255, 209, 102, 0.4);
+}
+.categoria-btn.activa { 
+    background: linear-gradient(90deg, #FF6F61, #FF9A8C); 
+    color: white; border-color: #FF6F61; 
+    transform: translateX(8px); 
+    box-shadow: 0 6px 15px rgba(255, 111, 97, 0.5); 
+}
+.estrellas { font-size: 18px; margin-top: 0px; }
+.estrella { color: #E0E4E7; text-shadow: none; }
+.estrella.ganada { color: #FFD166; text-shadow: 1px 1px 0 #4A4E69; }
+
+/* Botón de Regreso al menú (Nuevo) */
+#btn-menu-principal {
+    margin-top: auto; /* Empuja el botón hacia abajo */
+    background: #577590;
+    color: white;
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s;
+}
+#btn-menu-principal:hover {
+    background: #4A4E69;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* ÁREA DE JUEGO / STATS                          */
+/* -------------------------------------------------------------------------- */
+#area-juego { 
+    flex: 1; display: flex; flex-direction: column; padding: 30px; overflow-y: auto;
+    background-color: #F8F8F8;
+    background-image: radial-gradient(#9A8C98 1px, transparent 1px); background-size: 30px 30px;
+}
+.titulo-stats { 
+    text-align: center; color: white; font-size: 2.2em; font-weight: 700; 
+    text-shadow: 3px 3px 0px #4A4E69; 
+    padding: 10px 0;
+}
+
+#barra-progreso-stats {
+    background: linear-gradient(90deg, #9A8C98, #C3BABA); 
+    padding: 25px; border-radius: 35px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 25px; position: relative;
+}
+.stats-cajas { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+.stat-box { 
+    background: #FFFFFF; padding: 10px 20px; border-radius: 20px; text-align: center; 
+    width: 140px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    border: 2px solid #577590;
+}
+.stat-label { font-size: 0.9em; font-weight: 700; margin-bottom: 5px; color: #577590; }
+.stat-valor { font-size: 1.8em; font-weight: 900; color: #FF6F61; }
+
+.progreso-bar-contenedor { width: 100%; height: 35px; background-color: rgba(0, 0, 0, 0.2); border-radius: 50px; overflow: hidden; }
+#progreso-bar { 
+    height: 100%; width: 0%; 
+    background: linear-gradient(90deg, #FFD166, #FF6F61); 
+    transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; 
+    color: #4A4E69; font-weight: 900; font-size: 1.2em; text-shadow: 1px 1px 0 white;
+}
+.puntos-totales-lateral {
+    position: absolute; top: -15px; right: 20px; 
+    background: #4A4E69; 
+    padding: 10px 20px; border-radius: 25px; text-align: center; 
+    color: #FFD166; font-weight: 700; 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 3px solid white;
+}
+.puntos-totales-lateral span { font-size: 3em; display: block; line-height: 1; }
+#instruccion { 
+    display: block; text-align: center; margin-bottom: 15px; 
+    font-size: 1.2em; font-weight: 700; color: #4A4E69;
+}
+
+/* -------------------------------------------------------------------------- */
+/* TARJETAS Y OPCIONES                           */
+/* -------------------------------------------------------------------------- */
+
+#tablero { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-bottom: 180px; }
+.tarjeta { 
+    background: #FFFFFF; padding: 25px; border-radius: 30px; width: 220px; 
+    display: flex; flex-direction: column; align-items: center; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: transform 0.3s; 
+    border: 4px solid #FF6F61; /* Borde de contraste */
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+.emoji-grande { 
+    font-size: 80px; margin-bottom: 10px; 
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+    cursor: pointer; 
+    transition: transform 0.2s; 
+}
+.emoji-grande:hover { transform: scale(1.2) rotate(5deg); }
+
+.zona-drop { 
+    width: 100%; height: 55px; border: 3px dashed #90AFC5; 
+    border-radius: 15px; margin-top: 10px;
+    display: flex; align-items: center; justify-content: center; 
+    color: #577590; font-size: 1.1em; font-weight: 700;
+    transition: all 0.3s; background: #EAF2F8; 
+    text-transform: uppercase;
+}
+.zona-drop.hover { 
+    border-color: #FF6F61; 
+    background: #FFF9E9; 
+    transform: scale(1.05); 
+    box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
+}
+.zona-drop.acierto {
+    animation: aciertoAnim 0.3s;
+    color: white !important;
+    font-weight: 900;
+}
+.zona-drop.error {
+    animation: shake 0.3s;
+}
+@keyframes aciertoAnim { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+.tarjeta.completada { animation: irseVolando 0.8s forwards ease-in; }
+@keyframes irseVolando { 0% { transform: scale(1); } 20% { transform: scale(0.9); } 100% { transform: translate(100px, -300px) rotate(30deg); opacity: 0; } }
+
+
+/* --- PANEL OPCIONES (FICHAS) --- */
+#panel-opciones {
+    position: fixed; bottom: 0; left: 280px; right: 0; background: #4A4E69; 
+    padding: 20px 20px 40px 20px; /* Más padding inferior */
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3); 
+    display: flex; justify-content: center;
+    flex-wrap: wrap; gap: 15px; z-index: 50; min-height: 120px;
+}
+.ficha { 
+    background: linear-gradient(135deg, #FFD166, #FF6F61); 
+    color: #4A4E69; 
+    padding: 12px 25px;
+    border-radius: 30px; 
+    font-size: 1.2em; 
+    cursor: grab; 
+    box-shadow: 0 5px 0 #4A4E69;
+    transition: all 0.1s; 
+    display: flex; align-items: center; gap: 8px; 
+    font-weight: 900;
+    text-transform: uppercase;
+}
+.ficha:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 0 #4A4E69; }
+.ficha:active { transform: translateY(0); box-shadow: 0 5px 0 #4A4E69; }
+.ficha.usada { transform: scale(0); opacity: 0; width: 0; margin: 0; padding: 0; transition: all 0.4s; }
+.btn-play-mini { 
+    background: rgba(0,0,0,0.1); 
+    color: white;
+    border-radius: 50%; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center; font-size: 1em; cursor: pointer; 
+}
+
+/* -------------------------------------------------------------------------- */
+/* MODAL                                   */
+/* -------------------------------------------------------------------------- */
+
+#modal {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(74, 78, 105, 0.8); /* Azul oscuro semi-transparente */
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
+}
+.modal-content {
+    background: #FFFFFF;
+    padding: 50px;
+    border-radius: 40px;
+    text-align: center;
+    animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    border: 8px solid #FFD166;
+    max-width: 90%;
+}
+.modal-content h1 { font-size: 5em; margin-bottom: 10px; }
+#modal-titulo { color: #FF6F61; font-size: 2.5em; text-shadow: 3px 3px 0 #4A4E69; }
+#modal-puntos { 
+    margin: 25px 0; font-size: 1.5em; font-weight: 700; 
+    color: #577590; background: #EAF2F8; padding: 10px; border-radius: 10px;
+}
+.modal-content button { 
+    font-size: 1.4em; padding: 12px 40px; 
+    /* Se reutiliza el estilo del botón comenzar */
+}
+
+/* -------------------------------------------------------------------------- */
+/* MEDIA QUERIES                               */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 850px) {
+    .contenedor-principal { flex-direction: column; }
+    #sidebar { 
+        width: 100%; flex-direction: row; overflow-x: scroll; padding: 10px; 
+        height: 90px;
+    }
+    #area-juego { padding: 15px; }
+    #panel-opciones { left: 0; right: 0; padding-bottom: 20px; }
+    .perfil { display: none; }
+    #barra-progreso-stats { padding: 15px; border-radius: 20px; }
+    .stats-cajas { gap: 15px; }
+    .stat-box { width: 100px; padding: 8px 10px; }
+    .puntos-totales-lateral { top: -10px; right: 10px; padding: 5px 10px; }
+    .puntos-totales-lateral span { font-size: 2em; }
+    #tablero { margin-bottom: 120px; }
+}
+
+/* Botón de Google */
+.btn-google {
+    background-color: #ffffff;
+    color: #757575;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 50px;
+    border: 2px solid #ddd;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-google:hover {
+    background-color: #f1f1f1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+.btn-google img {
+    width: 24px;
+    height: 24px;
+}
